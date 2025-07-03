@@ -38,10 +38,15 @@ const cell = style({
   padding: '1rem',
 });
 
+export const btmContent = style({
+  padding: 0,
+  backgroundColor: '#252527',
+});
 export const appSt = {
   bottomBtn,
   container,
   box,
   row,
   cell,
+  btmContent,
 };

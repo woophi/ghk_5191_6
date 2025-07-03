@@ -1,16 +1,57 @@
+import { BottomSheet } from '@alfalab/core-components/bottom-sheet';
 import { ButtonMobile } from '@alfalab/core-components/button/mobile';
 import { Collapse } from '@alfalab/core-components/collapse';
 import { Gap } from '@alfalab/core-components/gap';
 import { PureCell } from '@alfalab/core-components/pure-cell';
 import { Typography } from '@alfalab/core-components/typography';
+import { BanknotesLineMIcon } from '@alfalab/icons-glyph/BanknotesLineMIcon';
+import { BubblesMIcon } from '@alfalab/icons-glyph/BubblesMIcon';
+import { BulbMIcon } from '@alfalab/icons-glyph/BulbMIcon';
 import { ChevronDownMIcon } from '@alfalab/icons-glyph/ChevronDownMIcon';
 import { ChevronUpMIcon } from '@alfalab/icons-glyph/ChevronUpMIcon';
+import { CrownMIcon } from '@alfalab/icons-glyph/CrownMIcon';
+import { InformationCircleMIcon } from '@alfalab/icons-glyph/InformationCircleMIcon';
+import { LightningMIcon } from '@alfalab/icons-glyph/LightningMIcon';
+import { StarMIcon } from '@alfalab/icons-glyph/StarMIcon';
 import { useEffect, useState } from 'react';
 import hb from './assets/hb.png';
 import heart from './assets/heart.png';
 import house from './assets/house.png';
 import { LS, LSKeys } from './ls';
 import { appSt } from './style.css';
+
+const items = [
+  {
+    title: 'Мгновенный вывод 100 000 ₽ в месяц',
+    text: 'Без подписки — до 3 рабочих дней',
+    IconComp: BanknotesLineMIcon,
+  },
+  {
+    title: 'Уведомления по портфелю',
+    text: 'Получайте мгновенно информацию по аномалиям с вашим портфелем',
+    IconComp: BulbMIcon,
+  },
+  {
+    title: 'Приоритетный доступ к ЦФА',
+    text: 'Ваша заявка на новые выпуски точно исполнится',
+    IconComp: CrownMIcon,
+  },
+  {
+    title: 'Свежая информация о ЦФА',
+    text: 'О новых выпусках узнаете первыми',
+    IconComp: LightningMIcon,
+  },
+  {
+    title: 'Приоритетная поддержка',
+    text: 'Любой вопрос в чате Альфа-Инвестиций решится быстрее',
+    IconComp: BubblesMIcon,
+  },
+  {
+    title: 'Ранний доступ к новым функциям',
+    text: 'Сможете пользоваться инновационными решениями среди первых',
+    IconComp: StarMIcon,
+  },
+];
 
 const faqs = [
   {
@@ -40,13 +81,16 @@ const faqs = [
   },
 ];
 
-// if (LS.getItem(LSKeys.ShowThx, false)) {
-//    window.location.replace('');
-// }
+const LINK = 'alfabank://longread?endpoint=v1/adviser/longreads/60715';
+
+if (LS.getItem(LSKeys.ShowThx, false)) {
+  window.location.replace(LINK);
+}
 
 export const App = () => {
   const [loading, setLoading] = useState(false);
   const [collapsedItems, setCollapsedItem] = useState<string[]>([]);
+  const [openInfo, setOpenInfo] = useState(false);
 
   useEffect(() => {
     if (!LS.getItem(LSKeys.UserId, null)) {
@@ -60,7 +104,7 @@ export const App = () => {
 
     LS.setItem(LSKeys.ShowThx, true);
     setLoading(false);
-    // window.location.replace('')
+    window.location.replace(LINK);
   };
 
   return (
@@ -87,7 +131,7 @@ export const App = () => {
           Что вы получите
         </Typography.TitleResponsive>
 
-        <PureCell className={appSt.cell}>
+        <PureCell className={appSt.cell} onClick={() => setOpenInfo(!openInfo)}>
           <PureCell.Graphics verticalAlign="center">
             <img src={house} width={48} height={48} alt="house" />
           </PureCell.Graphics>
@@ -98,10 +142,13 @@ export const App = () => {
               </Typography.TitleResponsive>
 
               <Typography.Text view="primary-small" color="secondary-inverted">
-                Все паи биржевых фондов Альфа-Капитал
+                Суммой до 500 000 ₽ в период действия подписки
               </Typography.Text>
             </PureCell.Main>
           </PureCell.Content>
+          <PureCell.Graphics verticalAlign="center">
+            <InformationCircleMIcon color="#FFFFFF" />
+          </PureCell.Graphics>
         </PureCell>
 
         <PureCell className={appSt.cell}>
@@ -135,6 +182,36 @@ export const App = () => {
           если пополнить любой брокерский счет на сумму от 10 000 ₽ и удерживать её в течение 30 дней - подписка бесплатна до
           момента снижения остатков
         </Typography.Text>
+
+        <Typography.TitleResponsive
+          color="primary-inverted"
+          style={{ marginTop: '1rem' }}
+          tag="h2"
+          view="small"
+          font="system"
+          weight="semibold"
+        >
+          Больше преимуществ
+        </Typography.TitleResponsive>
+
+        {items.map(item => (
+          <PureCell className={appSt.cell} key={item.title}>
+            <PureCell.Graphics>
+              <item.IconComp color="#FFFFFF" />
+            </PureCell.Graphics>
+            <PureCell.Content>
+              <PureCell.Main>
+                <Typography.Text color="primary-inverted" view="primary-small" weight="bold">
+                  {item.title}
+                </Typography.Text>
+
+                <Typography.Text view="primary-small" color="secondary-inverted">
+                  {item.text}
+                </Typography.Text>
+              </PureCell.Main>
+            </PureCell.Content>
+          </PureCell>
+        ))}
 
         <Typography.TitleResponsive
           color="primary-inverted"
@@ -195,6 +272,30 @@ export const App = () => {
           Попробовать бесплатно
         </ButtonMobile>
       </div>
+      <BottomSheet
+        open={openInfo}
+        onClose={() => {
+          setOpenInfo(false);
+        }}
+        contentClassName={appSt.btmContent}
+      >
+        <div className={appSt.container} style={{ marginTop: '1rem' }}>
+          <Typography.Text view="primary-medium" tag="p" defaultMargins={false} color="primary-inverted">
+            Распространяется только на сделки покупки-продажи ценных бумаг на биржевых рынках Московской биржи. Плата за все
+            иные операции с ценными бумагами и иностранной валютой взимается согласно тарифному плану
+          </Typography.Text>
+          <ButtonMobile
+            block
+            view="primary"
+            onClick={() => {
+              setOpenInfo(false);
+            }}
+            style={{ backgroundColor: '#1C1C1E' }}
+          >
+            Понятно
+          </ButtonMobile>
+        </div>
+      </BottomSheet>
     </>
   );
 };
